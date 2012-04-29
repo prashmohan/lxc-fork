@@ -3382,3 +3382,21 @@ int kernel_sock_shutdown(struct socket *sock, enum sock_shutdown_cmd how)
 	return sock->ops->shutdown(sock, how);
 }
 EXPORT_SYMBOL(kernel_sock_shutdown);
+
+/*
+ * cj-hack @ April-29-2012
+ * print socket related information, family, type, protocol, address....
+ */
+#include <net/inet_sock.h>
+void show_sock_info(void *sockp)
+{
+        struct socket *sock = (struct socket *)sockp;
+        struct sock *sk = sock->sk;
+        printk("family:%d, type:%d, protocol:%d.\n",
+               sk->sk_family, sk->sk_type, sk->sk_protocol);
+        if (sk->sk_family == AF_INET) {
+                struct inet_sock *inet = (struct inet_sock *)sk;
+                printk("\t\tport=%x\n", inet->inet_sport);
+        }
+}
+EXPORT_SYMBOL(show_sock_info);

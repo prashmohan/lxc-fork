@@ -357,6 +357,7 @@ struct file *lxc_find_new_file(struct file *old_file, struct task_struct *tsk,
  */
 #include <linux/fs_struct.h>
 extern int aa_get_name(struct path *path, int flags, char **buffer, const char **name);
+extern void show_sock_info(void *);
 
 struct files_struct *deep_dup_fd(struct files_struct *oldf, struct files_struct *parentf,
                                  int *errorp, struct task_struct *tsk, struct task_struct *otsk,
@@ -554,9 +555,11 @@ struct files_struct *deep_dup_fd(struct files_struct *oldf, struct files_struct 
                                 }
                                 break;
                         }
-                        case S_IFSOCK: //socket
-                                printk("[%d] socket file.\n", open_files - i);
+                        case S_IFSOCK: {//socket
+                                printk("[%d]socket: ", open_files - i);
+                                show_sock_info(of->private_data);
                                 break;
+                        }
                         default: //unknown type
                                 printk("[%d] unknown file i_mode: 0%o[0x%x].\n",
                                        open_files - i, i_mode, i_mode);
